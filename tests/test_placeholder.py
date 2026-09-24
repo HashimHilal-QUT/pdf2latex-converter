@@ -1,4 +1,4 @@
-import fitz
+import pymupdf as fitz
 
 from core.pdf_checker import analyze_pdf
 

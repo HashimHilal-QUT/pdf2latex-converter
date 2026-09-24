@@ -1,5 +1,5 @@
 import re
-import fitz  # PyMuPDF
+import pymupdf as fitz
 
 
 def extract_doi_from_text(text: str) -> str | None:
