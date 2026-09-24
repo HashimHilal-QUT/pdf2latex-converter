@@ -14,18 +14,22 @@ def analyze_pdf(pdf_path: str) -> dict:
     doc = fitz.open(pdf_path)
     total_text = ""
     first_page_text = ""
+    page_count = doc.page_count
 
-    for idx, page in enumerate(doc):
-        page_text = page.get_text()
-        total_text += page_text
-        if idx == 0:
-            first_page_text = page_text
+    try:
+        for idx, page in enumerate(doc):
+            page_text = page.get_text()
+            total_text += page_text
+            if idx == 0:
+                first_page_text = page_text
+    finally:
+        doc.close()
 
     char_count = len(total_text.strip())
-    page_count = len(doc)
+    has_extractable_text = bool(total_text.strip())
 
-    # Simple heuristic: If average characters per page is very low, it's likely scanned
-    is_scanned = (char_count / max(page_count, 1)) < 100
+    # If a PDF contains selectable text, it is not a scanned image-only document.
+    is_scanned = not has_extractable_text
     doi = extract_doi_from_text(first_page_text) or extract_doi_from_text(
         total_text
     )
