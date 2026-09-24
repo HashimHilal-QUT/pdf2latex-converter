@@ -1,6 +1,6 @@
 import urllib.parse
 import xml.etree.ElementTree as ET
-from habanero import Crossref
+
 import requests
 
 
@@ -21,7 +21,6 @@ def check_arxiv_by_title_or_doi(title: str = None, doi: str = None) -> str | Non
 
     if response.status_code == 200:
         root = ET.fromstring(response.content)
-        # Atom feed namespace
         ns = {"atom": "http://www.w3.org/2005/Atom"}
         entry = root.find("atom:entry", ns)
         if entry is not None:
@@ -33,21 +32,47 @@ def check_arxiv_by_title_or_doi(title: str = None, doi: str = None) -> str | Non
 
 def fetch_crossref_metadata(doi: str) -> dict | None:
     """Fetch structured bibliographic metadata from Crossref."""
-    cr = Crossref()
+    encoded_doi = urllib.parse.quote(doi, safe="")
+    url = f"https://api.crossref.org/works/{encoded_doi}"
+
     try:
-        res = cr.works(ids=doi)
-        message = res.get("message", {})
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        message = response.json().get("message", {})
+
+        title = ""
+        if isinstance(message.get("title"), list) and message.get("title"):
+            title = message["title"][0]
+
+        authors = []
+        for author in message.get("author", []):
+            given = author.get("given", "").strip()
+            family = author.get("family", "").strip()
+            if given and family:
+                authors.append(f"{given} {family}")
+            elif family:
+                authors.append(family)
+            elif given:
+                authors.append(given)
+
+        journal = ""
+        container_title = message.get("container-title", [])
+        if isinstance(container_title, list) and container_title:
+            journal = container_title[0]
+
+        year = None
+        issued = message.get("issued", {})
+        date_parts = issued.get("date-parts", [[None]])
+        if date_parts and date_parts[0]:
+            year = date_parts[0][0]
+
         return {
-            "title": message.get("title", [""])[0],
-            "authors": [
-                f"{a.get('given', '')} {a.get('family', '')}"
-                for a in message.get("author", [])
-            ],
+            "title": title,
+            "authors": authors,
             "publisher": message.get("publisher"),
-            "journal": message.get("container-title", [""])[0],
-            "year": message.get("issued", {})
-            .get("date-parts", [[None]])[0][0],
+            "journal": journal,
+            "year": year,
         }
-    except Exception as e:
-        print(f"Crossref lookup failed for DOI {doi}: {e}")
+    except requests.RequestException as exc:
+        print(f"Crossref lookup failed for DOI {doi}: {exc}")
         return None
