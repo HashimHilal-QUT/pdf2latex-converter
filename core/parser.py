@@ -79,3 +79,45 @@ def pdf_to_latex(pdf_path: str, metadata: dict = None) -> str:
 
     latex_code.append("\\end{document}")
     return "\n".join(latex_code)
+
+
+def pdf_to_markdown(pdf_path: str, metadata: dict = None) -> str:
+    """Extract text from a PDF and convert it into a Markdown document."""
+    doc = fitz.open(pdf_path)
+    metadata = metadata or {}
+    title = (metadata.get("title") or "Untitled Document").strip()
+
+    markdown_lines = [f"# {title}", ""] if title else []
+
+    try:
+        for page_num in range(len(doc)):
+            page = doc[page_num]
+            blocks = page.get_text("blocks")
+
+            for block in blocks:
+                text = (block[4] or "").strip()
+                if not text:
+                    continue
+
+                clean_text = re.sub(r"<[^>]+>", "", text)
+                clean_text = re.sub(r"\r\n?", "\n", clean_text)
+                clean_text = re.sub(r"\n{3,}", "\n\n", clean_text)
+
+                paragraphs = [part.strip() for part in clean_text.split("\n\n") if part.strip()]
+
+                for paragraph in paragraphs:
+                    lines = [line.strip() for line in paragraph.splitlines() if line.strip()]
+                    if not lines:
+                        continue
+
+                    if all(line.startswith(("- ", "* ")) for line in lines):
+                        markdown_lines.extend(f"- {line[2:].strip()}" for line in lines)
+                    else:
+                        markdown_lines.append("\n".join(lines))
+
+                    markdown_lines.append("")
+    finally:
+        doc.close()
+
+    markdown_text = "\n".join(markdown_lines).strip()
+    return markdown_text or "# Untitled Document\n\nNo extractable text was found in this PDF."

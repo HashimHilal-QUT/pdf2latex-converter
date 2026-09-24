@@ -1,7 +1,7 @@
 import pymupdf as fitz
 
 from core.pdf_checker import analyze_pdf
-from core.parser import pdf_to_latex
+from core.parser import pdf_to_latex, pdf_to_markdown
 
 
 def test_analyze_pdf_detects_text_and_doi(tmp_path):
@@ -35,6 +35,21 @@ def test_pdf_to_latex_strips_html_metadata(tmp_path):
 
     assert "<b>" not in latex
     assert "Urban Resilience Through Cognitive Computing Systems" in latex
+
+
+def test_pdf_to_markdown_extracts_text(tmp_path):
+    pdf_path = tmp_path / "sample.pdf"
+    doc = fitz.open()
+    page = doc.new_page()
+    page.insert_text((72, 72), "# Sample Heading\n\nThis is a markdown test.\n\n- First item\n- Second item")
+    doc.save(pdf_path)
+    doc.close()
+
+    markdown = pdf_to_markdown(str(pdf_path))
+
+    assert "# Sample Heading" in markdown
+    assert "This is a markdown test." in markdown
+    assert "- First item" in markdown
 
 
 def test_fetch_crossref_metadata_parses_response(monkeypatch):
