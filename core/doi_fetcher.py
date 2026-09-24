@@ -6,7 +6,7 @@ import requests
 
 def check_arxiv_by_title_or_doi(title: str = None, doi: str = None) -> str | None:
     """Check if the paper exists on arXiv to fetch direct TeX source files."""
-    base_url = "http://export.arxiv.org/api/query?"
+    base_url = "https://export.arxiv.org/api/query?"
     query = ""
 
     if doi:
@@ -17,15 +17,23 @@ def check_arxiv_by_title_or_doi(title: str = None, doi: str = None) -> str | Non
         return None
 
     params = {"search_query": query, "start": 0, "max_results": 1}
-    response = requests.get(base_url, params=params, timeout=10)
 
-    if response.status_code == 200:
+    try:
+        response = requests.get(base_url, params=params, timeout=20)
+        response.raise_for_status()
+    except requests.RequestException:
+        return None
+
+    try:
         root = ET.fromstring(response.content)
-        ns = {"atom": "http://www.w3.org/2005/Atom"}
-        entry = root.find("atom:entry", ns)
-        if entry is not None:
-            arxiv_id = entry.find("atom:id", ns).text.split("/abs/")[-1]
-            return f"https://arxiv.org/e-print/{arxiv_id}"
+    except ET.ParseError:
+        return None
+
+    ns = {"atom": "http://www.w3.org/2005/Atom"}
+    entry = root.find("atom:entry", ns)
+    if entry is not None:
+        arxiv_id = entry.find("atom:id", ns).text.split("/abs/")[-1]
+        return f"https://arxiv.org/e-print/{arxiv_id}"
 
     return None
 
