@@ -11,7 +11,14 @@ st.set_page_config(
     layout="wide",
 )
 
-st.title("Academic PDF to LaTeX and Markdown Converter")
+st.image(
+    "https://myresearchdata.blob.core.windows.net/academic/Academic_Dude.JPG",
+    use_container_width=True,
+)
+st.title("From Academic PDF to Editable Knowledge")
+st.write(
+    "Upload a research paper and turn it into clean, downloadable LaTeX and Markdown in seconds."
+)
 
 uploaded_file = st.file_uploader("Choose an Academic Paper PDF", type=["pdf"])
 
@@ -50,3 +57,10 @@ if uploaded_file and st.button("Convert"):
             mime="text/markdown",
             use_container_width=True,
         )
+
+st.markdown(
+    "<p style='text-align: center; font-style: italic;'>"
+    "Are you thinking what I am thinking ? We both know what this tool will be used for !"
+    "</p>",
+    unsafe_allow_html=True,
+)
