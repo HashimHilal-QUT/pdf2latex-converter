@@ -11,10 +11,12 @@ st.set_page_config(
     layout="wide",
 )
 
-st.image(
-    "https://myresearchdata.blob.core.windows.net/academic/Academic_Dude.JPG",
-    use_container_width=True,
-)
+image_left, image_center, image_right = st.columns([1, 2, 1])
+with image_center:
+    st.image(
+        "https://myresearchdata.blob.core.windows.net/academic/Academic_Dude.JPG",
+        use_container_width=True,
+    )
 st.title("From Academic PDF to Editable Knowledge")
 st.write(
     "Upload a research paper and turn it into clean, downloadable LaTeX and Markdown in seconds."
