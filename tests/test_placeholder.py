@@ -1,6 +1,7 @@
 import pymupdf as fitz
 
 from core.pdf_checker import analyze_pdf
+from core.parser import pdf_to_latex
 
 
 def test_analyze_pdf_detects_text_and_doi(tmp_path):
@@ -17,6 +18,23 @@ def test_analyze_pdf_detects_text_and_doi(tmp_path):
     assert result["char_count"] > 0
     assert result["is_scanned"] is False
     assert result["detected_doi"] == "10.1000/example123"
+
+
+def test_pdf_to_latex_strips_html_metadata(tmp_path):
+    pdf_path = tmp_path / "sample.pdf"
+    doc = fitz.open()
+    page = doc.new_page()
+    page.insert_text((72, 72), "This is a test document.")
+    doc.save(pdf_path)
+    doc.close()
+
+    latex = pdf_to_latex(
+        str(pdf_path),
+        {"title": "Urban Resilience <b>T</b>hrough Cognitive Computing Systems"},
+    )
+
+    assert "<b>" not in latex
+    assert "Urban Resilience Through Cognitive Computing Systems" in latex
 
 
 def test_fetch_crossref_metadata_parses_response(monkeypatch):

@@ -1,7 +1,18 @@
+import re
 import urllib.parse
 import xml.etree.ElementTree as ET
 
 import requests
+
+
+def clean_html_tags(text: str) -> str:
+    """Remove HTML formatting tags returned by Crossref API."""
+    if not text:
+        return ""
+    cleaned = re.sub(r"<[^>]+>", "", text)
+    cleaned = re.sub(r"(?<=\b[A-Z])\s+(?=[a-z])", "", cleaned)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return cleaned
 
 
 def check_arxiv_by_title_or_doi(title: str = None, doi: str = None) -> str | None:
@@ -37,19 +48,6 @@ def check_arxiv_by_title_or_doi(title: str = None, doi: str = None) -> str | Non
 
     return None
 
-import re
-
-
-def clean_html_tags(text: str) -> str:
-    """Remove HTML formatting tags returned by Crossref API."""
-    if not text:
-        return ""
-    return re.sub(r"<[^>]+>", "", text).strip()
-
-
-# Inside fetch_crossref_metadata, update the return statement:
-# "title": clean_html_tags(message.get("title", [""])[0])
-
 def fetch_crossref_metadata(doi: str) -> dict | None:
     """Fetch structured bibliographic metadata from Crossref."""
     encoded_doi = urllib.parse.quote(doi, safe="")
@@ -62,12 +60,12 @@ def fetch_crossref_metadata(doi: str) -> dict | None:
 
         title = ""
         if isinstance(message.get("title"), list) and message.get("title"):
-            title = message["title"][0]
+            title = clean_html_tags(message["title"][0])
 
         authors = []
         for author in message.get("author", []):
-            given = author.get("given", "").strip()
-            family = author.get("family", "").strip()
+            given = clean_html_tags(author.get("given", "")).strip()
+            family = clean_html_tags(author.get("family", "")).strip()
             if given and family:
                 authors.append(f"{given} {family}")
             elif family:

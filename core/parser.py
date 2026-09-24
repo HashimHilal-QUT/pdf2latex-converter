@@ -1,20 +1,37 @@
-import fitz  # PyMuPDF
 import re
+
+import pymupdf as fitz
+
+
+def sanitize_latex_text(value: str) -> str:
+    """Strip markup and escape characters that are invalid in LaTeX."""
+    if value is None:
+        return ""
+
+    cleaned = re.sub(r"<[^>]+>", "", value)
+    cleaned = re.sub(r"(?<=\b[A-Z])\s+(?=[a-z])", "", cleaned)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    cleaned = cleaned.replace("\\", r"\textbackslash{}")
+    cleaned = cleaned.replace("&", r"\&")
+    cleaned = cleaned.replace("%", r"\%")
+    cleaned = cleaned.replace("$", r"\$")
+    cleaned = cleaned.replace("#", r"\#")
+    cleaned = cleaned.replace("_", r"\_")
+    cleaned = cleaned.replace("{", r"\{")
+    cleaned = cleaned.replace("}", r"\}")
+    return cleaned.strip()
 
 
 def pdf_to_latex(pdf_path: str, metadata: dict = None) -> str:
     """Parse PDF layout and generate LaTeX document code."""
     doc = fitz.open(pdf_path)
+    metadata = metadata or {}
 
-    # Document Header Setup
-    title = (
-        metadata.get("title", "Document Title") if metadata else "Untitled"
-    )
-    authors = (
-        " \\and ".join(metadata.get("authors", []))
-        if metadata and metadata.get("authors")
-        else "Author Name"
-    )
+    title = sanitize_latex_text(metadata.get("title", "Document Title")) or "Untitled"
+    title = re.sub(r"\s+", " ", title).strip()
+    authors = [sanitize_latex_text(author) for author in metadata.get("authors", []) if author]
+    authors = [re.sub(r"\s+", " ", author).strip() for author in authors]
+    author_text = " \\and ".join(authors) if authors else "Author Name"
 
     latex_code = [
         "\\documentclass[10pt,a4paper]{article}",
@@ -24,7 +41,7 @@ def pdf_to_latex(pdf_path: str, metadata: dict = None) -> str:
         "\\usepackage{hyperref}",
         "",
         f"\\title{{{title}}}",
-        f"\\author{{{authors}}}",
+        f"\\author{{{author_text}}}",
         "\\date{\\today}",
         "",
         "\\begin{document}",
@@ -32,39 +49,33 @@ def pdf_to_latex(pdf_path: str, metadata: dict = None) -> str:
         "",
     ]
 
-    # Extract text block by block across pages
-    for page_num in range(len(doc)):
-        page = doc[page_num]
-        # get_text("blocks") returns list of tuples: (x0, y0, x1, y1, "text", block_no, block_type)
-        blocks = page.get_text("blocks")
+    try:
+        for page_num in range(len(doc)):
+            page = doc[page_num]
+            blocks = page.get_text("blocks")
 
-        for b in blocks:
-            text = b[4].strip()
-            if not text:
-                continue
-
-            # Detect potential Section Headings (heuristic based on formatting/case)
-            if len(text.split("\n")) == 1 and len(text) < 80:
-                if (
-                    text.isupper()
-                    or re.match(r"^\d+(\.\d+)*\s+", text)
-                    or "Abstract" in text
-                    or "Introduction" in text
-                ):
-                    clean_heading = re.sub(r"^\d+(\.\d+)*\s*", "", text)
-                    latex_code.append(f"\n\\section{{{clean_heading}}}\n")
+            for block in blocks:
+                text = block[4].strip()
+                if not text:
                     continue
 
-            # Escape LaTeX special characters in body text
-            escaped_text = (
-                text.replace("&", "\\&")
-                .replace("%", "\\%")
-                .replace("$", "\\$")
-                .replace("#", "\\#")
-                .replace("_", "\\_")
-            )
+                if len(text.split("\n")) == 1 and len(text) < 80:
+                    if (
+                        text.isupper()
+                        or re.match(r"^\d+(\.\d+)*\s+", text)
+                        or "Abstract" in text
+                        or "Introduction" in text
+                    ):
+                        clean_heading = sanitize_latex_text(
+                            re.sub(r"^\d+(\.\d+)*\s*", "", text)
+                        )
+                        latex_code.append(f"\n\\section{{{clean_heading}}}\n")
+                        continue
 
-            latex_code.append(f"{escaped_text}\n")
+                escaped_text = sanitize_latex_text(text)
+                latex_code.append(f"{escaped_text}\n")
+    finally:
+        doc.close()
 
     latex_code.append("\\end{document}")
     return "\n".join(latex_code)
