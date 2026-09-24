@@ -37,6 +37,18 @@ def check_arxiv_by_title_or_doi(title: str = None, doi: str = None) -> str | Non
 
     return None
 
+import re
+
+
+def clean_html_tags(text: str) -> str:
+    """Remove HTML formatting tags returned by Crossref API."""
+    if not text:
+        return ""
+    return re.sub(r"<[^>]+>", "", text).strip()
+
+
+# Inside fetch_crossref_metadata, update the return statement:
+# "title": clean_html_tags(message.get("title", [""])[0])
 
 def fetch_crossref_metadata(doi: str) -> dict | None:
     """Fetch structured bibliographic metadata from Crossref."""
