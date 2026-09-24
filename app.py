@@ -11,7 +11,7 @@ st.set_page_config(
     layout="wide",
 )
 
-image_left, image_center, image_right = st.columns([18, 4, 18])
+image_left, image_center, image_right = st.columns([17, 6, 17])
 with image_center:
     st.image(
         "https://myresearchdata.blob.core.windows.net/academic/Academic_Dude.webp",
