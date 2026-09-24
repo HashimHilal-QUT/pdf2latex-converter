@@ -1,0 +1,53 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# VS Code & Codespaces
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# OS / System generated files
+.DS_Store
+Thumbs.db
+
+# Temporary PDF uploads and test artifacts
+tmp/
+temp/
+*.log
+*.tmp
+
+# Generated LaTeX build/auxiliary files (if compiling locally)
+*.aux
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+*.out
+
+# Distribution / Packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+
+# PyTest / Testing
+.pytest_cache/
+.coverage
+htmlcov/

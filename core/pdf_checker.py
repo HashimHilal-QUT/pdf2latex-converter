@@ -1,14 +1,14 @@
-"""PDF classification utilities."""
+import fitz  # PyMuPDF
 
-
-def classify_pdf(path: str):
-    """Placeholder PDF pre-filter.
-
-    Intended to detect whether a PDF is scanned, contains selectable text,
-    or already approximates a LaTeX-native source.
-    """
+def analyze_pdf(pdf_path):
+    doc = fitz.open(pdf_path)
+    total_text = ""
+    for page in doc:
+        total_text += page.get_text()
+    
+    is_scanned = len(total_text.strip()) < 100
     return {
-        "path": path,
-        "kind": "unknown",
-        "details": "not_implemented",
+        "page_count": len(doc),
+        "is_scanned": is_scanned,
+        "char_count": len(total_text)
     }
