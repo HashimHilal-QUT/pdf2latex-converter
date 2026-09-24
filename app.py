@@ -7,19 +7,19 @@ from core.parser import pdf_to_latex, pdf_to_markdown
 
 
 st.set_page_config(
-    page_title="Academic PDF Converter",
+    page_title="Papers 4 AI",
     layout="wide",
 )
 
-image_left, image_center, image_right = st.columns([1, 2, 1])
+image_left, image_center, image_right = st.columns([17, 6, 17])
 with image_center:
     st.image(
         "https://myresearchdata.blob.core.windows.net/academic/Academic_Dude.JPG",
         use_container_width=True,
     )
-st.title("From Academic PDF to Editable Knowledge")
+st.title("Papers 4 AI")
 st.write(
-    "Upload a research paper and turn it into clean, downloadable LaTeX and Markdown in seconds."
+    "Transform research papers into clean, editable LaTeX and Markdown with AI-ready precision."
 )
 
 uploaded_file = st.file_uploader("Choose an Academic Paper PDF", type=["pdf"])
@@ -63,6 +63,12 @@ if uploaded_file and st.button("Convert"):
 st.markdown(
     "<p style='text-align: center; font-style: italic;'>"
     "Are you thinking what I am thinking ? We both know what this tool will be used for !"
+    "</p>",
+    unsafe_allow_html=True,
+)
+st.markdown(
+    "<p style='text-align: center; font-size: 0.8rem;'>"
+    "&copy; 2026&nbsp;&nbsp;Made by AI for AI"
     "</p>",
     unsafe_allow_html=True,
 )
