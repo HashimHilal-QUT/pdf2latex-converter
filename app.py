@@ -68,7 +68,8 @@ st.markdown(
 )
 st.markdown(
     "<p style='text-align: center; font-size: 0.8rem;'>"
-    "&copy; 2026&nbsp;&nbsp;Made by AI for AI"
+    "&copy; 2026&nbsp;&nbsp;Made by AI for AI&nbsp;&nbsp;|&nbsp;&nbsp;"
+    "Disclaimer: No data is stored in this app, it is just a conversion tool"
     "</p>",
     unsafe_allow_html=True,
 )
