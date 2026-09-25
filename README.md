@@ -6,7 +6,7 @@ A CPU-only Streamlit app that converts an uploaded academic PDF into both LaTeX 
 
 https://papers-4-ai.streamlit.app/
 
-<img src="https://github.com/HashimHilal-QUT/pdf2latex-converter/blob/main/Academic_Dude.JPG?raw=true" alt="Academic Dude" width="50%" />
+<img src="https://myresearchdata.blob.core.windows.net/academic/Academic_Dude.webp" alt="Academic Dude" width="30%" />
 
 ## Features
 
