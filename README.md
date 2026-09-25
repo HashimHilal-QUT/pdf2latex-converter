@@ -1,33 +1,54 @@
-# PDF2LaTeX Converter
+# Papers 4 AI
 
-A CPU-only Streamlit app that converts an uploaded academic PDF into both LaTeX and Markdown. The app shows the two results side by side and provides a download button for each file.
+Transform research papers into clean, editable LaTeX and Markdown with AI-ready precision.
 
-## Site URL
+## Live app
 
 https://papers-4-ai.streamlit.app/
 
-<img src="https://myresearchdata.blob.core.windows.net/academic/Academic_Dude.webp" alt="Academic Dude" width="30%" />
+<img src="https://myresearchdata.blob.core.windows.net/academic/Academic_Dude.webp" alt="Papers 4 AI" width="28%" />
+
+## Overview
+
+Papers 4 AI is a lightweight Streamlit application that takes an academic PDF and converts it into two usable formats:
+
+- LaTeX (`.tex`)
+- Markdown (`.md`)
+
+The app is designed for researchers, students, and AI workflows that need a fast way to turn PDFs into editable text that can be reused in notebooks, prompts, documentation, and technical writing.
+
+## How it works
+
+1. Upload an academic paper PDF.
+2. The app analyzes the file to report page count and whether the PDF appears scanned.
+3. It extracts the readable text from the document.
+4. It generates both LaTeX and Markdown output side by side.
+5. You can review the content and download either file directly.
 
 ## Features
 
-- Extracts selectable PDF text with PyMuPDF.
-- Generates a basic editable LaTeX document.
-- Generates Markdown from the extracted PDF text.
-- Displays `.tex` and `.md` output previews in the browser.
-- Downloads the generated files as `converted.tex` and `converted.md`.
-- Reports page count and whether the PDF contains extractable text.
+- PDF upload interface for academic papers
+- Extracts selectable text from uploaded PDFs
+- Generates editable LaTeX output
+- Generates Markdown output
+- Displays both outputs in the browser for comparison
+- Download buttons for `.tex` and `.md` files
+- Reports PDF metadata such as page count and scan status
+- CPU-only setup with no GPU required
 
-This project works from PDFs supplied by the user. It does not retrieve full-text source files from DOI URLs. Commercial publishers may keep PDFs and source files behind paywalls, and a DOI alone does not guarantee access to editable LaTeX.
+## Disclaimer
 
-## Requirements
+This app is a conversion tool only. It does not store user data, and it does not retrieve full-text files from DOI URLs or publisher systems. Some PDFs may be locked behind publisher paywalls or may not contain fully extractable text.
 
-- Python 3.11 or newer
+## Local development
+
+### Requirements
+
+- Python 3.11+
 - pip
 - CPU-only environment
 
-No GPU, Colab notebook, OCR engine, Poppler installation, or API key is required for the current workflow.
-
-## Run locally
+### Run locally
 
 ```bash
 python -m venv .venv
@@ -36,38 +57,34 @@ python -m pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Open the local URL printed by Streamlit, upload a PDF, and select **Convert**.
+Then open the local Streamlit URL in your browser, upload a PDF, and click Convert.
 
-## Deploy on Streamlit Community Cloud
+## Deployment
 
-1. Push this repository to GitHub.
-2. In Streamlit Community Cloud, choose **Create app**.
-3. Select the repository, branch, and `app.py` as the main file.
-4. Deploy the app.
+This project is designed to run on Streamlit Community Cloud.
 
-Streamlit Cloud installs Python dependencies from `requirements.txt`. The `packages.txt` file is intentionally empty because this app has no required Linux system packages. The app is suitable for standard CPU hosting and does not need a secrets configuration.
+1. Push the repository to GitHub.
+2. In Streamlit Community Cloud, choose Create app.
+3. Select the repository and branch.
+4. Set `app.py` as the main file.
+5. Deploy.
 
-## Test before publishing
+## Project structure
 
-Run the automated tests locally:
-
-```bash
-. .venv/bin/activate
-pytest -q
-```
-
-Compile-check the application modules:
-
-```bash
-python -m py_compile app.py core/parser.py core/pdf_checker.py core/doi_fetcher.py
-```
-
-## Project files
-
-- `app.py` - Streamlit interface and download controls
-- `core/parser.py` - LaTeX and Markdown conversion
-- `core/pdf_checker.py` - PDF analysis
-- `core/doi_fetcher.py` - retained network utility for optional metadata scripts; not used by the app UI
+- `app.py` - Streamlit app interface
+- `core/parser.py` - LaTeX and Markdown conversion logic
+- `core/pdf_checker.py` - PDF analysis and validation
+- `core/doi_fetcher.py` - retained utility for optional metadata-related work
+- `requirements.txt` - Python dependencies
+- `packages.txt` - intentionally empty for this app
 - `tests/` - automated regression tests
-- `requirements.txt` - Python dependencies for local and Streamlit deployment
-- `packages.txt` - intentionally empty system dependency file
+
+## Quote
+
+> Are you thinking what I am thinking? We both know what this tool will be used for!
+
+## Copyright
+
+© 2026 Made by AI for AI
+
+Disclaimer: No data is stored in this app; it is just a conversion tool.
