@@ -2,6 +2,12 @@
 
 A CPU-only Streamlit app that converts an uploaded academic PDF into both LaTeX and Markdown. The app shows the two results side by side and provides a download button for each file.
 
+## Site URL
+
+https://papers-4-ai.streamlit.app/
+
+![Academic Dude](https://github.com/HashimHilal-QUT/pdf2latex-converter/blob/main/Academic_Dude.JPG?raw=true)
+
 ## Features
 
 - Extracts selectable PDF text with PyMuPDF.
